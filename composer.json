@@ -1,0 +1,23 @@
+{
+    "name": "ai-seo/generator",
+    "description": "WordPress plugin for automated SEO content generation with Google Gemini AI",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "Plixail",
+            "homepage": "https://www.plixail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.4",
+        "google/apiclient": "^2.15",
+        "monolog/monolog": "^2.9",
+        "psr/log": "^1.1"
+    },
+    "config": {
+        "platform": {
+            "php": "7.4"
+        }
+    }
+}

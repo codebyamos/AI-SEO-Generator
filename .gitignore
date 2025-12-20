@@ -1,0 +1,37 @@
+# Credentials and secrets - NEVER commit these
+*.json
+!composer.json
+credentials/
+*credentials*.json
+*service-account*.json
+*.pem
+*.key
+
+# Environment files
+.env
+.env.*
+*.local
+
+# Composer dependencies
+vendor/
+composer.lock
+composer.phar
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# WordPress specific
+wp-config.php
+debug.log
+
+# Backup files
+*.bak
+*.backup
+*~
