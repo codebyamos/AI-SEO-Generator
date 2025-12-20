@@ -72,6 +72,11 @@ class AI_SEO_GitHub_Updater {
      * Handle manual update check
      */
     public function handle_manual_check() {
+        // Display any stored update check message
+        if (get_transient('ai_seo_update_message')) {
+            add_action('admin_notices', array($this, 'display_update_message'));
+        }
+        
         if (!isset($_GET['ai_seo_check_update']) || !current_user_can('update_plugins')) {
             return;
         }
@@ -95,33 +100,43 @@ class AI_SEO_GitHub_Updater {
             $current_version = AI_SEO_VERSION;
             
             if (version_compare($latest_version, $current_version, '>')) {
-                add_action('admin_notices', function() use ($latest_version) {
-                    echo '<div class="notice notice-info is-dismissible"><p>';
-                    printf(
+                set_transient('ai_seo_update_message', array(
+                    'type' => 'info',
+                    'message' => sprintf(
                         __('<strong>AI SEO Generator:</strong> A new version (%s) is available! <a href="%s">Update now</a>.', 'ai-seo-generator'),
                         esc_html($latest_version),
                         esc_url(admin_url('plugins.php'))
-                    );
-                    echo '</p></div>';
-                });
+                    )
+                ), 30);
             } else {
-                add_action('admin_notices', function() {
-                    echo '<div class="notice notice-success is-dismissible"><p>';
-                    echo '<strong>AI SEO Generator:</strong> ' . __('You are running the latest version.', 'ai-seo-generator');
-                    echo '</p></div>';
-                });
+                set_transient('ai_seo_update_message', array(
+                    'type' => 'success',
+                    'message' => '<strong>AI SEO Generator:</strong> ' . __('You are running the latest version.', 'ai-seo-generator')
+                ), 30);
             }
         } else {
-            add_action('admin_notices', function() {
-                echo '<div class="notice notice-warning is-dismissible"><p>';
-                echo '<strong>AI SEO Generator:</strong> ' . __('Unable to check for updates. Please try again later.', 'ai-seo-generator');
-                echo '</p></div>';
-            });
+            set_transient('ai_seo_update_message', array(
+                'type' => 'warning',
+                'message' => '<strong>AI SEO Generator:</strong> ' . __('Unable to check for updates. Please try again later.', 'ai-seo-generator')
+            ), 30);
         }
         
         // Redirect to remove query args
         wp_redirect(admin_url('plugins.php'));
         exit;
+    }
+    
+    /**
+     * Display stored update message
+     */
+    public function display_update_message() {
+        $message_data = get_transient('ai_seo_update_message');
+        if ($message_data) {
+            delete_transient('ai_seo_update_message');
+            echo '<div class="notice notice-' . esc_attr($message_data['type']) . ' is-dismissible"><p>';
+            echo wp_kses_post($message_data['message']);
+            echo '</p></div>';
+        }
     }
     
     /**
