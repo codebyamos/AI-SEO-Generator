@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: AI SEO Generator
- * Plugin URI: https://github.com/ai-seo-generator
+ * Plugin URI: https://github.com/codebyamos/AI-SEO-Generator
  * Description: Automated SEO content generation with Google Gemini AI, Google Sheets integration, and scheduling
  * Version: 1.0.0
  * Author: Plixail
@@ -65,6 +65,7 @@ class AI_SEO_Generator {
         require_once AI_SEO_PLUGIN_DIR . 'class-email-notifications.php';
         require_once AI_SEO_PLUGIN_DIR . 'class-settings.php';
         require_once AI_SEO_PLUGIN_DIR . 'class-ajax.php';
+        require_once AI_SEO_PLUGIN_DIR . 'class-github-updater.php';
     }
     
     /**
@@ -102,6 +103,7 @@ class AI_SEO_Generator {
         AI_SEO_Scheduler::get_instance();
         AI_SEO_Settings::get_instance();
         AI_SEO_AJAX::get_instance();
+        AI_SEO_GitHub_Updater::get_instance();
         
         // Add custom admin footer for regenerate buttons
         add_action('admin_footer-post.php', array($this, 'add_regenerate_buttons_ui'));
