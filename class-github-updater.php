@@ -285,7 +285,8 @@ class AI_SEO_GitHub_Updater {
     
     /**
      * Fix the directory name after extraction
-     * GitHub zipball extracts to owner-repo-hash format, we need to rename it
+     * If the zip contains a single folder at root, WordPress will extract to that folder
+     * We need to ensure it's named correctly for the plugin
      */
     public function fix_directory_name($source, $remote_source, $upgrader, $hook_extra = array()) {
         global $wp_filesystem;
@@ -295,11 +296,22 @@ class AI_SEO_GitHub_Updater {
         }
         
         $correct_name = dirname($this->slug);
+        
+        // If the extracted folder already has the correct name, no need to rename
+        if (basename($source) === $correct_name) {
+            return $source;
+        }
+        
+        // Otherwise, try to rename it
         $new_source = trailingslashit($remote_source) . $correct_name;
         
         if ($source !== $new_source) {
             if ($wp_filesystem->move($source, $new_source)) {
                 return $new_source;
+            } else {
+                // If rename fails, just return the source as-is
+                // WordPress will attempt to use it anyway
+                return $source;
             }
         }
         
