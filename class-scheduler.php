@@ -283,6 +283,12 @@ class AI_SEO_Scheduler {
                 array('%d')
             );
             
+            // Send failure email notification for this article
+            if (get_option('AI_SEO_email_notifications', true)) {
+                $notifications = AI_SEO_Email_Notifications::get_instance();
+                $notifications->send_failure($item->keywords, $error_message);
+            }
+            
             // Check if queue batch is complete (no more pending items)
             $this->maybe_send_batch_complete_notification();
             
@@ -300,6 +306,12 @@ class AI_SEO_Scheduler {
             array('%s', '%d'),
             array('%d')
         );
+        
+        // Send success email notification for this article
+        if (get_option('AI_SEO_email_notifications', true)) {
+            $notifications = AI_SEO_Email_Notifications::get_instance();
+            $notifications->send_success($item->keywords, $result['post_id']);
+        }
         
         // Update Google Sheets if this item came from sheets
         if (!empty($item->sheets_row)) {
