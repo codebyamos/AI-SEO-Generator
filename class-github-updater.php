@@ -222,12 +222,16 @@ class AI_SEO_GitHub_Updater {
             // Look specifically for ai-seo-generator-*.zip files, not auto-generated Source code
             if (!empty($release_info['assets'])) {
                 foreach ($release_info['assets'] as $asset) {
+                    error_log('AI SEO Updater: Checking asset: ' . $asset['name']);
                     if (strpos($asset['name'], 'ai-seo-generator-') === 0 && strpos($asset['name'], '.zip') !== false) {
                         $download_url = $asset['browser_download_url'];
+                        error_log('AI SEO Updater: Using asset download URL: ' . $download_url);
                         break;
                     }
                 }
             }
+            
+            error_log('AI SEO Updater: Final download URL: ' . $download_url);
             
             $plugin_data = $this->get_plugin_data();
             
