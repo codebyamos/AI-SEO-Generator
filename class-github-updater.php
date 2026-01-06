@@ -19,7 +19,7 @@ class AI_SEO_GitHub_Updater {
     private $github_repo = 'codebyamos/AI-SEO-Generator';
     private $github_api_url = 'https://api.github.com/repos/';
     private $transient_name = 'ai_seo_github_update';
-    private $transient_expiration = 43200; // 12 hours
+    private $transient_expiration = 604800; // 7 days (weekly check)
     
     /**
      * Get singleton instance
