@@ -17,6 +17,9 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+// Debug: Log plugin load
+error_log('AI SEO Generator: Plugin loaded - Version 1.0.1');
+
 // Define plugin constants
 define('AI_SEO_VERSION', '1.0.1');
 define('AI_SEO_PLUGIN_DIR', plugin_dir_path(__FILE__));
