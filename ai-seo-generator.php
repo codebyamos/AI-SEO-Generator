@@ -18,7 +18,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('AI_SEO_VERSION', '1.0.0');
+define('AI_SEO_VERSION', '1.0.1');
 define('AI_SEO_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('AI_SEO_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('AI_SEO_PLUGIN_FILE', __FILE__);
