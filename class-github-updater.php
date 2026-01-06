@@ -44,8 +44,22 @@ class AI_SEO_GitHub_Updater {
         // add_filter('upgrader_source_selection', array($this, 'fix_directory_name'), 10, 4);
         add_filter('plugin_action_links_' . $this->slug, array($this, 'add_action_links'));
         
+        // Add User-Agent header for GitHub downloads
+        add_filter('http_request_args', array($this, 'add_github_headers'), 10, 2);
+        
         // Handle manual update check
         add_action('admin_init', array($this, 'handle_manual_check'));
+    }
+    
+    /**
+     * Add headers for GitHub API requests
+     */
+    public function add_github_headers($args, $url) {
+        if (strpos($url, 'github.com') !== false || strpos($url, 'api.github.com') !== false) {
+            $args['headers']['Accept'] = 'application/octet-stream';
+            $args['headers']['User-Agent'] = 'WordPress/' . get_bloginfo('version') . '; ' . get_bloginfo('url');
+        }
+        return $args;
     }
     
     /**
