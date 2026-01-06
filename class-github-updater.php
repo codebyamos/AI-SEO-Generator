@@ -40,7 +40,8 @@ class AI_SEO_GitHub_Updater {
         
         add_filter('pre_set_site_transient_update_plugins', array($this, 'check_for_update'));
         add_filter('plugins_api', array($this, 'plugin_info'), 20, 3);
-        add_filter('upgrader_source_selection', array($this, 'fix_directory_name'), 10, 4);
+        // Temporarily disable the directory rename filter - let WordPress handle it
+        // add_filter('upgrader_source_selection', array($this, 'fix_directory_name'), 10, 4);
         add_filter('plugin_action_links_' . $this->slug, array($this, 'add_action_links'));
         
         // Handle manual update check
