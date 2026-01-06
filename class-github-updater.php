@@ -204,9 +204,10 @@ class AI_SEO_GitHub_Updater {
             $download_url = $release_info['zipball_url'];
             
             // Check for uploaded asset (preferred)
+            // Look specifically for ai-seo-generator-*.zip files, not auto-generated Source code
             if (!empty($release_info['assets'])) {
                 foreach ($release_info['assets'] as $asset) {
-                    if (strpos($asset['name'], '.zip') !== false) {
+                    if (strpos($asset['name'], 'ai-seo-generator-') === 0 && strpos($asset['name'], '.zip') !== false) {
                         $download_url = $asset['browser_download_url'];
                         break;
                     }
@@ -271,9 +272,10 @@ class AI_SEO_GitHub_Updater {
         );
         
         // Check for uploaded asset
+        // Look specifically for ai-seo-generator-*.zip files
         if (!empty($release_info['assets'])) {
             foreach ($release_info['assets'] as $asset) {
-                if (strpos($asset['name'], '.zip') !== false) {
+                if (strpos($asset['name'], 'ai-seo-generator-') === 0 && strpos($asset['name'], '.zip') !== false) {
                     $result->download_link = $asset['browser_download_url'];
                     break;
                 }
