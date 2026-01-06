@@ -287,10 +287,15 @@ class AI_SEO_GitHub_Updater {
     
     /**
      * Fix the directory name after extraction
-     * If the zip contains a single folder at root, WordPress will extract to that folder
-     * We need to ensure it's named correctly for the plugin
+     * This filter is mostly a fallback and may not be needed with proper zip structure
      */
     public function fix_directory_name($source, $remote_source, $upgrader, $hook_extra = array()) {
+        // If extraction went to wp-content/plugins/ai-seo-generator directly, we're done
+        if (basename($source) === 'ai-seo-generator') {
+            return $source;
+        }
+        
+        // Otherwise, try standard approach for nested folder
         global $wp_filesystem;
         
         if (!isset($hook_extra['plugin']) || $hook_extra['plugin'] !== $this->slug) {
@@ -299,21 +304,19 @@ class AI_SEO_GitHub_Updater {
         
         $correct_name = dirname($this->slug);
         
-        // If the extracted folder already has the correct name, no need to rename
-        if (basename($source) === $correct_name) {
-            return $source;
-        }
-        
-        // Otherwise, try to rename it
-        $new_source = trailingslashit($remote_source) . $correct_name;
-        
-        if ($source !== $new_source) {
-            if ($wp_filesystem->move($source, $new_source)) {
+        // Check if source has the plugin folder inside
+        $plugin_folder_inside = $source . '/' . $correct_name;
+        if (is_dir($plugin_folder_inside)) {
+            // Move contents up one level
+            $new_source = trailingslashit($remote_source) . $correct_name;
+            if ($source !== $new_source) {
+                // Copy contents from nested folder to correct location
+                foreach (glob($plugin_folder_inside . '/*') as $file) {
+                    $wp_filesystem->move($file, $new_source . '/' . basename($file));
+                }
+                // Remove empty folder
+                $wp_filesystem->delete($source);
                 return $new_source;
-            } else {
-                // If rename fails, just return the source as-is
-                // WordPress will attempt to use it anyway
-                return $source;
             }
         }
         
