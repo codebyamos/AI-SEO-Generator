@@ -3,7 +3,7 @@
  * Plugin Name: AI SEO Generator
  * Plugin URI: https://github.com/codebyamos/AI-SEO-Generator
  * Description: Automated SEO content generation with Google Gemini AI, Google Sheets integration, and scheduling
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: Plixail
  * Author URI: https://www.plixail.com
  * License: GPL v2 or later
