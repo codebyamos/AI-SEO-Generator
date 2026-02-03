@@ -338,9 +338,8 @@ class AI_SEO_Scheduler {
         // Find items that have been processing for more than 10 minutes
         // Check if they actually have a completed post
         $stuck_items = $wpdb->get_results(
-            "SELECT q.*, p.ID as found_post_id 
+            "SELECT q.* 
             FROM {$table_name} q
-            LEFT JOIN {$wpdb->posts} p ON p.ID = q.post_id
             WHERE q.status = 'processing' 
             AND q.updated_at < DATE_SUB(NOW(), INTERVAL 10 MINUTE)"
         );
