@@ -94,9 +94,6 @@ class AI_SEO_Generator {
         // Fix plugin directory after extraction from GitHub
         add_filter('upgrader_source_selection', array($this, 'fix_plugin_directory_name'), 10, 4);
         
-        // Reactivate plugin after update
-        add_action('upgrader_process_complete', array($this, 'reactivate_after_update'), 10, 2);
-        
         // Show admin notice if Composer dependencies are missing
         add_action('admin_notices', array($this, 'check_dependencies'));
     }
@@ -105,11 +102,17 @@ class AI_SEO_Generator {
      * Check for missing dependencies and show admin notice
      */
     public function check_dependencies() {
-        if (!file_exists(AI_SEO_PLUGIN_DIR . 'vendor/autoload.php')) {
-            echo '<div class="notice notice-error"><p>';
-            echo '<strong>AI SEO Generator:</strong> ';
-            echo __('Composer dependencies are missing. Please run <code>composer install</code> in the plugin directory, or upload the <code>vendor</code> folder. Google Sheets and Image Generation features will not work until this is resolved.', 'ai-seo-generator');
-            echo '</p></div>';
+        // Check if composer autoloader was successfully loaded
+        if (!class_exists('Google\Service\Sheets')) {
+            // Only show error if we actually tried to use it
+            if (!file_exists(ABSPATH . '../vendor/autoload.php') && 
+                !file_exists(ABSPATH . 'vendor/autoload.php') && 
+                !file_exists(AI_SEO_PLUGIN_DIR . 'vendor/autoload.php')) {
+                echo '<div class="notice notice-error"><p>';
+                echo '<strong>AI SEO Generator:</strong> ';
+                echo __('Composer dependencies are missing. Ensure the <code>vendor</code> folder exists in <code>/public_html/</code> at the root level. Google Sheets and Image Generation features will not work until this is resolved.', 'ai-seo-generator');
+                echo '</p></div>';
+            }
         }
     }
     
@@ -610,56 +613,7 @@ class AI_SEO_Generator {
         return @rmdir($dir);
     }
     
-    /**
-     * Reactivate plugin after WordPress update completes
-     * This prevents "Plugin file does not exist" errors when updating from GitHub
-     */
-    public function reactivate_after_update($upgrader, $hook_extra) {
-        // Check if this is a plugin update
-        if (!isset($hook_extra['type']) || $hook_extra['type'] !== 'plugin') {
-            return;
-        }
-        
-        // Check if our plugin was updated
-        if (!isset($hook_extra['plugins']) || !is_array($hook_extra['plugins'])) {
-            return;
-        }
-        
-        $plugin_basename = plugin_basename(AI_SEO_PLUGIN_FILE);
-        
-        // Check if our plugin is in the update list
-        $our_plugin_updated = false;
-        foreach ($hook_extra['plugins'] as $plugin) {
-            if ($plugin === $plugin_basename || strpos($plugin, 'ai-seo-generator') !== false) {
-                $our_plugin_updated = true;
-                break;
-            }
-        }
-        
-        if (!$our_plugin_updated) {
-            return;
-        }
-        
-        // Get the current active plugins
-        $active_plugins = get_option('active_plugins', array());
-        
-        // Clear any old paths that might reference old versions
-        $active_plugins = array_filter($active_plugins, function($plugin) {
-            // Remove any ai-seo-generator entries that aren't our canonical path
-            if (strpos($plugin, 'ai-seo-generator') !== false) {
-                return $plugin === plugin_basename(AI_SEO_PLUGIN_FILE);
-            }
-            return true;
-        });
-        
-        // Ensure our plugin is in the active list with correct path
-        $active_plugins = array_unique(array_merge($active_plugins, array($plugin_basename)));
-        
-        // Save the cleaned active plugins list
-        update_option('active_plugins', $active_plugins);
-        
-        error_log('AI SEO Generator: Plugin reactivated after update. Path: ' . $plugin_basename);
-    }
+
     
     /**
      * Create custom database tables
