@@ -576,7 +576,7 @@ class AI_SEO_Generator {
             if ($source !== $correct_dir && is_dir($source)) {
                 // Remove old directory if it exists
                 if (is_dir($correct_dir)) {
-                    wp_delete_dir_recursive($correct_dir);
+                    $this->delete_directory_recursive($correct_dir);
                 }
                 
                 // Rename versioned directory to correct name
@@ -588,6 +588,26 @@ class AI_SEO_Generator {
         }
         
         return $source;
+    }
+    
+    /**
+     * Recursively delete a directory
+     */
+    private function delete_directory_recursive($dir) {
+        if (!is_dir($dir)) {
+            return false;
+        }
+        
+        $files = array_diff(scandir($dir), array('.', '..'));
+        foreach ($files as $file) {
+            $path = $dir . '/' . $file;
+            if (is_dir($path)) {
+                $this->delete_directory_recursive($path);
+            } else {
+                @unlink($path);
+            }
+        }
+        return @rmdir($dir);
     }
     
     /**
