@@ -93,6 +93,7 @@ class AI_SEO_Generator {
         
         // Fix plugin directory after extraction from GitHub
         add_filter('upgrader_source_selection', array($this, 'fix_plugin_directory_name'), 10, 4);
+        add_action('upgrader_process_complete', array($this, 'cleanup_versioned_plugin_dir'), 10, 2);
         
         // Show admin notice if Composer dependencies are missing
         add_action('admin_notices', array($this, 'check_dependencies'));
@@ -557,6 +558,46 @@ class AI_SEO_Generator {
         wp_clear_scheduled_hook('ai_seo_process_single_item');
         
         flush_rewrite_rules();
+    }
+    
+    /**
+     * Fix plugin directory name after update completes
+     * This runs AFTER reactivation, so it doesn't interfere with WordPress' update process
+     */
+    public function cleanup_versioned_plugin_dir($upgrader, $hook_extra) {
+        // Check if this is a plugin update
+        if (!isset($hook_extra['type']) || $hook_extra['type'] !== 'plugin') {
+            return;
+        }
+        
+        // Check if our plugin was updated
+        if (!isset($hook_extra['plugins']) || !is_array($hook_extra['plugins'])) {
+            return;
+        }
+        
+        $our_plugin_updated = false;
+        foreach ($hook_extra['plugins'] as $plugin) {
+            if (strpos($plugin, 'ai-seo-generator') !== false) {
+                $our_plugin_updated = true;
+                break;
+            }
+        }
+        
+        if (!$our_plugin_updated) {
+            return;
+        }
+        
+        // Look for versioned directory and clean it up if it exists
+        $plugins_dir = WP_PLUGIN_DIR;
+        $base_dir = basename($plugins_dir);
+        $versioned_pattern = $plugins_dir . '/ai-seo-generator-*';
+        
+        foreach (glob($versioned_pattern) as $versioned_dir) {
+            if (is_dir($versioned_dir)) {
+                $this->delete_directory_recursive($versioned_dir);
+                error_log('AI SEO Generator: Cleaned up versioned directory: ' . basename($versioned_dir));
+            }
+        }
     }
     
     /**
